@@ -1,0 +1,14 @@
+Source: acme-migasfree-server
+Section: config
+Priority: standard
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage:
+
+Package: acme-migasfree-server
+Architecture: all
+Pre-Depends: migasfree-server
+Description: migasfree-server customization
+ ACME migasfree-server customization sample. This is a dummy
+ configuration for a migasfree server.
