@@ -1,0 +1,14 @@
+Source: acme-epson-al-m300
+Section: utils
+Priority: extra
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.7
+Homepage: https://github.com/migasfree/fun-with-migasfree-examples/tree/master/acme-epson-al-m300
+
+Package: acme-epson-al-m300
+Architecture: all
+Pre-Depends: cups
+Depends: ${misc:Depends}
+Description: PPDs for EPSON AL M300
+ PPDs example for EPSON AL M300
