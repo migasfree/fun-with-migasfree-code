@@ -1,0 +1,14 @@
+Source: acme-media-disable
+Section: utils
+Priority: extra
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: https://github.com/migasfree/fun-with-migasfree-examples
+
+Package: acme-media-disable
+Architecture: all
+Pre-Depends: 
+Depends: ${misc:Depends}, 
+Description: Mount disable in /media (USB & CDROM)
+ The user can not mount in /media (USB & CDROM)
