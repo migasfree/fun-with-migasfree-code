@@ -19,7 +19,7 @@ from migasfree_client import settings as client_settings
 
 
 class ApiConsumer():
-    def __init__(self, user, URLPathVersioning="/api/v1/token"):
+    def __init__(self, user, token="", URLPathVersioning="/api/v1/token"):
         self.user = user
         self.URLPathVersioning = URLPathVersioning
 
@@ -29,28 +29,34 @@ class ApiConsumer():
         self.host = config.get('server', 'localhost')
         self.connection = httplib.HTTPConnection(self.host)
 
-        if not os.path.exists(_token_file):
-            password = self.get_password()
-            if password:
+        if token:
+            self.token = token
+        else:
+            if not os.path.exists(_token_file):
+                password = self.get_password()
+                if password:
+                    data = json.dumps({"username": user, "password": password})
+                    headers = {"Content-type": "application/json"}
+                    self.connection.request(
+                        'POST',
+                        '/token-auth/',
+                        data,
+                        headers)
 
-                data = json.dumps({"username": user, "password": password})
-                headers = {"Content-type": "application/json"}
-                self.connection.request('POST', '/token-auth/', data, headers)
+                    response = self.connection.getresponse()
+                    status = response.status
+                    body = response.read()
+                    if status == httplib.OK:
+                        with open(_token_file, 'w') as handle:
+                            handle.write(json.loads(body)["token"])
+                    else:
+                        print("Error")
+                        print(status)
+                        print(body)
+                        exit()
 
-                response = self.connection.getresponse()
-                status = response.status
-                body = response.read()
-                if status == httplib.OK:
-                    with open(_token_file, 'w') as handle:
-                        handle.write(json.loads(body)["token"])
-                else:
-                    print("Error")
-                    print(status)
-                    print(body)
-                    exit()
-
-        with open(_token_file, "r") as handle:
-            self.token = handle.read()
+            with open(_token_file, "r") as handle:
+                self.token = handle.read()
 
         self.headers = {
             "Content-type": "application/json",
