@@ -7,6 +7,7 @@ import os
 import httplib
 import json
 import urllib
+import platform
 
 from distutils.sysconfig import get_python_lib
 
@@ -16,6 +17,15 @@ if not get_python_lib() in sys.path:
 
 from migasfree_client.utils import get_config
 from migasfree_client import settings as client_settings
+
+
+def getUserPath():
+    _platform = platform.system()
+    if _platform == 'Linux':
+        _env = "HOME"
+    elif _platform == 'Windows':
+        _env = "USERPROFILE"
+    return os.getenv(_env)
 
 
 class ApiConsumer():
@@ -65,7 +75,7 @@ class ApiConsumer():
 
     def token_file(self):
         return os.path.join(
-            os.getenv("HOME"),
+            getUserPath(),
             ".migasfree-token.%s" % self.user
         )
 
