@@ -17,7 +17,7 @@ def main():
 
     computers = api.filter(
         "computers",
-        {"login__attributes__id": attribute_id, "ordering": "id"}
+        {"sync_attributes__id": attribute_id, "ordering": "id"}
     )
 
     for c in computers:

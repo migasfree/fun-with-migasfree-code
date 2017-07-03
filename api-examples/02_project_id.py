@@ -11,10 +11,10 @@ def main():
     user = "reader"
     api = ApiConsumer(user=user)
 
-    version_name = get_mfc_version()
+    project_name = get_mfc_version()
 
-    version_id = api.get_id("versions", {"name": version_name})
-    print "version_id:", version_id
+    project_id = api.get_id("projects", {"name": project_name})
+    print "project_id:", project_id
 
 if __name__ == "__main__":
     main()
