@@ -8,6 +8,7 @@ import httplib
 import json
 import urllib
 import platform
+import csv
 
 from distutils.sysconfig import get_python_lib
 
@@ -164,3 +165,25 @@ class ApiConsumer():
 
     def is_forbidden(self):
         return self.status == httplib.FORBIDDEN
+
+    def csv(self, endpoint, params={}, fieldnames=[], output="output.csv"):
+
+        def render_line(element, fieldnames):
+            line = {}
+            for keys in fieldnames:
+                x = element
+                for key in keys.split('.'):
+                    x = x[key]
+                    line[keys] = x
+            return line
+
+        with open(output, 'wb') as csvfile:
+            if fieldnames:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+            for element in self.filter(endpoint, params):
+                if not fieldnames:
+                    fieldnames = element.keys()
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    writer.writeheader()
+                writer.writerow(render_line(element, fieldnames))
