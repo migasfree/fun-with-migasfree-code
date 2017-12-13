@@ -3,17 +3,17 @@
 
 # Change to status reserved the computers with label "ETQ-RED"
 
-from api_consumer import ApiConsumer
+from migasfree_sdk import ApiToken
 
 
 def main():
     user = "admin"
-    api = ApiConsumer(user=user)
+    api = ApiToken(user=user)
 
     # Get Label "ETQ-RED"
     prefix = "ETQ"
-    value = "RED"
-    attribute_id = api.get_id("attributes", {"prefix": prefix, "value": value})
+    value = "RED "
+    attribute_id = api.id("attributes", {"prefix": prefix, "value": value})
 
     computers = api.filter(
         "computers",
@@ -26,10 +26,10 @@ def main():
             'computers/%i/status' % c["id"],
             {"status": "reserved"}
         )
-        if api.is_ok():
-            print"Status changed to: %s" % response["status"]
+        if api.is_ok(response.status_code):
+            print"Status changed to: %s" % response.json()["status"]
         else:
-            print "Error: %s %s changing status" % (api.status, api.reason)
+            print "Error: %s %s changing status" % (response.status_code, response.json())
 
 if __name__ == "__main__":
     main()

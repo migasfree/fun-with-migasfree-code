@@ -3,12 +3,12 @@
 
 # List cid's name's and uuid's Computers
 
-from api_consumer import ApiConsumer
+from migasfree_sdk import ApiToken
 
 
 def main():
     user = "reader"
-    api = ApiConsumer(user=user)
+    api = ApiToken(user=user)
 
     for element in api.filter(
             "computers",

@@ -3,21 +3,23 @@
 
 # Hardware to csv
 
-from api_consumer import ApiConsumer
+from migasfree_sdk import ApiToken
 import os
 
 if __name__ == "__main__":
 
-    output = 'hardware.csv'
     user = "reader"
-    endpoint = 'computers'
-    fieldnames = ['id', 'name', 'product', 'cpu', 'ram', 'disks',
-        'storage', 'project.name', 'mac_address', 'ip_address']
-    params = {"status": "intended", "ordering": "id"}
+    fields = [
+        'id', 'name', 'product', 'cpu', 'ram', 'disks',
+        'storage', 'project.name', 'mac_address', 'ip_address'
+    ]
+    output = "hardware.csv"
 
-    api = ApiConsumer(user=user)
-    api.csv(endpoint, params, fieldnames, output)
-
+    api = ApiToken(user=user)
+    api.csv(
+        'computers',
+        {"status": "intended", "ordering": "id"},
+        fields,
+        output
+    )
     os.system("xdg-open %s" % output)
-
-
