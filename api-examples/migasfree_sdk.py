@@ -138,6 +138,8 @@ class ApiToken():
             )
             if r.status_code in self._ok_codes:
                 data = r.json()
+                if isinstance(data, (list,)):
+                    return data                
                 if data["count"] == 1:
                     return data["results"][0]
                 elif data["count"] == 0:
