@@ -58,7 +58,6 @@ class ApiToken():
                             with open(_token_file, 'w') as handle:
                                 handle.write(r.json()["token"])
                     else:
-                        print r.json()
                         raise Exception('Status code %s' % r.status_code)
             else:
                 with open(_token_file, "r") as handle:
@@ -138,8 +137,8 @@ class ApiToken():
             )
             if r.status_code in self._ok_codes:
                 data = r.json()
-                if isinstance(data, (list,)):
-                    return data                
+                if isinstance(data, (list,)) or "count" not in data:
+                    return data
                 if data["count"] == 1:
                     return data["results"][0]
                 elif data["count"] == 0:
@@ -169,7 +168,6 @@ class ApiToken():
         if r.status_code == requests.codes.created:
             return r.json()["id"]
         else:
-            print r.json()
             Exception('Status code %s' % r.status_code)
 
     @staticmethod
@@ -260,92 +258,7 @@ class ApiToken():
                 writer.writerow(render_line(element, fields))
 
 
-if __name__ == '__main__':
-    api = ApiToken(
-        token="9c8afd1fa3512c05f2366b3502ddd78ffb06d8d5"
-    )
 
-    print
-    print "--------------------------------"
-    print "La segunda pagina de atributos"
-    print api.paginate("attributes", {"page": 2})
 
-    print
-    print "--------------------------------"
-    print "Todos los atributos PCI"
-    for x in api.filter("attributes", {"property_att__prefix": "PCI"}):
-        print x["value"], x["description"]
 
-    print
-    print "--------------------------------"
-    print "Crea un Conjunto de Atributos"
-    r = api.post("attribute-set", {
-        "excluded_attributes": [],
-        "included_attributes": [],
-        "enabled": True,
-        "name": "NUEVO",
-        "description": "POST - nuevo conjunto"
-        }
-    )
-    print r, r.json()
 
-    print
-    print "--------------------------------"
-    print "Modificar todo el Conjunto de Atributos"
-    j = api.put("attribute-set", r.json()["id"], {
-        "excluded_attributes": [],
-        "included_attributes": [],
-        "enabled": True,
-        "name": "NUEVO",
-        "description": "PUT- modificado"
-        }
-    )
-    print j, j.json()
-
-    print
-    print "--------------------------------"
-    print "Modificar el campo descripcion de un Conjunto de Atributos"
-    d = api.patch("attribute-set", r.json()["id"], {"description": "HOLA"})
-    print d, d.json()
-
-    print
-    print "--------------------------------"
-    print "Borrar el Conjunto de Atributos"
-    h = api.delete("attribute-set", r.json()["id"])
-    print h
-
-    print
-    print "--------------------------------"
-    print "Obtener el id de un elemento"
-    print api.id("computers", {"name": 'PC25619'})
-
-    print
-    print "--------------------------------"
-    print "Obtener un elemento"
-    print api.get("computers", {"name": 'PC25619'})["uuid"]
-
-    print
-    print "--------------------------------"
-    print "El Ordenador 4855"
-    x = api.get("computers", 4855)
-    print x["name"], x["uuid"]
-
-    api = ApiToken(
-        # server="127.0.0.1"
-        # user="reader",
-        # save_token=True,
-        token="9c8afd1fa3512c05f2366b3502ddd78ffb06d8d5"
-    )
-
-    fields = [
-        'id', 'name', 'product', 'cpu', 'ram', 'disks',
-        'storage', 'project.name', 'mac_address', 'ip_address'
-    ]
-    output = "hardware.csv"
-    api.csv(
-        'computers',
-        {"status": "intended", "ordering": "id"},
-        fields,
-        output
-    )
-    os.system("xdg-open %s" % output)
