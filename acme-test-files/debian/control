@@ -1,0 +1,13 @@
+Source: acme-test-files
+Section: x11
+Priority: extra
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: https://github.com/migasfree/fun-with-migasfree-examples/acme-test-files
+
+Package: acme-test-files
+Architecture: all
+Depends: ${misc:Depends}
+Description: Archivos de prueba para Asistencia a Usuarios.
+ Sirven para comprobar las asociaciones de archivos y aplicaciones.
