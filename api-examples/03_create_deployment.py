@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Create a repository named "bluefish_geany"
+# Create a deployment named "bluefish_geany"
 
 import datetime
 
-from migasfree_client.utils import get_mfc_version, get_hardware_uuid
-from migasfree_sdk import ApiToken
+from migasfree_client.utils import get_mfc_project, get_hardware_uuid
+from migasfree_sdk.api import ApiToken
 
 
 def main():
     user = "admin"
     api = ApiToken(user=user)
 
-    project_name = get_mfc_version()
+    project_name = get_mfc_project()
     project_id = api.id("projects", {"name": project_name})
 
     all_systems_id = api.id(
@@ -38,7 +38,6 @@ def main():
     }
 
     deployment_id = api.add("deployments", data)
-
     if deployment_id:
         print "deployment_id", deployment_id
 

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Hardware to csv
+# Computers' hardware resume to CSV
 
-from migasfree_sdk import ApiToken
 import os
 
-if __name__ == "__main__":
+from migasfree_sdk.api import ApiToken
 
+
+if __name__ == "__main__":
     user = "reader"
     fields = [
         'id', 'name', 'product', 'cpu', 'ram', 'disks',
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     output = "hardware.csv"
 
     api = ApiToken(user=user)
-    api.csv(
+    api.export_csv(
         'computers',
         {"status": "intended", "ordering": "id"},
         fields,

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# List cid's name's and uuid's Computers
+# Show computers' CID, name and UUID
 
-from migasfree_sdk import ApiToken
+from migasfree_sdk.api import ApiToken
 
 
 def main():
@@ -11,9 +11,9 @@ def main():
     api = ApiToken(user=user)
 
     for element in api.filter(
-            "computers",
-            {"status": "intended", "ordering": "id"}
-        ):
+        "computers",
+        {"status": "intended", "ordering": "id"}
+    ):
         print element["id"], element["name"], element["uuid"]
 
 if __name__ == "__main__":
