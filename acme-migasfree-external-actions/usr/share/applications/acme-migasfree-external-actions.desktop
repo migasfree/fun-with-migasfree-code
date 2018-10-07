@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=acme-migasfree-external-actions
+Exec=/usr/bin/acme-migasfree-external-actions %U
+Terminal=false
+Icon=migasfree
+MimeType=x-scheme-handler/mea;
+Categories=Application;Utility;
+NoDisplay=true
+StartupNotify=true
+StartupWMClass=CVIM
+
+Name[es_ES]=acme-migasfree-external-actions

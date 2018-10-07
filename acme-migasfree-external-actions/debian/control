@@ -1,0 +1,12 @@
+Source: acme-migasfree-external-actions
+Section: utils
+Priority: extra
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+
+Package: acme-migasfree-external-actions
+Architecture: all
+Depends: python, migasfree-sdk (>= 1.2-1), sshpass, zenity, vncviewer
+Description: Configures migasfree protocols in Firefox and Chromium
+ Protocol is MEA

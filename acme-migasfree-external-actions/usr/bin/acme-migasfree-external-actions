@@ -1,0 +1,246 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+"""
+
+CALL SAMPLE
+===========
+
+migasfree-external-action 'mea://{"related_ids":[3629,3628,5499],"model":"attribute","name":"ping","related_model":"computer","id":18745}'
+
+CONFIGURATION (SETTINGS.PY)
+===========================
+
+MIGASFREE_EXTERNAL_ACTIONS = {
+        "computer": {
+            "ping": {"title": "PING", "description": "comprobar conectividad"},
+            "ssh": {"title": "SSH", "description": "control remoto vía ssh"},
+            "vnc": {"title": "VNC", "description": "control remoto vía vnc", "many": False},
+            "sync": {"title": "SYNC", "description": "ejecutar la sincronización con el servidor migasfree"},
+        },
+}
+
+"""
+
+
+
+import sys
+import json
+import subprocess as sub
+from migasfree_sdk.api import ApiToken
+COUNT = 10
+api = None
+
+
+def get_password(title, text):
+    cmd = "zenity --title '{}' --entry --hide-text --text '{}' 2>/dev/null".format(title, text)
+    try:
+        password = sub.check_output(
+            cmd, stderr=sub.STDOUT, shell=True
+        )
+    except sub.CalledProcessError:
+        exit(1)
+
+    return password.replace("\n", "")
+
+
+def info(message):
+    cmd = 'zenity --title "migasfree-external-action" --info --text "{}"'.format(message)
+    try:
+        sub.check_output(
+            cmd, stderr=sub.STDOUT, shell=True
+        )
+    except sub.CalledProcessError:
+        exit(1)
+
+
+def warning(message):
+    cmd='zenity --title "migasfree-external-action" --warning --text "{}"'.format(message)
+    try:
+        sub.check_output(
+            cmd, stderr=sub.STDOUT, shell=True
+        )
+    except sub.CalledProcessError:
+        exit(1)
+
+
+def get_computer(id):
+    global api
+    computer = api.get("computers", {"id": id})
+    try:
+        # get user
+        user = api.get("computers/{}/sync".format(computer['id']), {})
+        for element in user:
+            computer[element] = user[element]
+    except:
+        pass
+
+    return computer
+
+
+
+def new_tab(computer, commands):
+    global api
+
+    # Tab Title and commands
+    c = "bash -c 'printf \"\\033]0;{name} {sync_user[fullname]}\\007\"; {_commands}'"
+
+    commands.extend([
+        'if [ $EXIT_CODE = 0 ]',
+        'then echo -e "\e[32m"; echo OK; echo ==; echo -e "\e[0m"',
+        'else echo -e "\e[31m"; echo ERROR; echo =====; echo -e "\e[0m"',
+        'fi',
+        'echo; echo "pulsa una tecla"',
+        'read'
+    ])
+
+    computer["_commands"] = ";".join(commands).format(**computer)
+
+    return c.format(**computer)
+
+
+def main():
+
+    global api
+
+    protocol, cdata = sys.argv[1].split("://")
+
+    data = json.loads(cdata.replace("%20"," ").replace("%22",'"'))
+
+    #info(json.dumps(data))
+
+    password = ""
+
+    api = ApiToken(server=data["server"], user="reader", save_token=True)
+
+    if len(data['related_ids']) > 1:
+        warning("Se va a realizar la acción '{}' sobre {} elementos. Cierra esta ventana si no estas seguro.".format(data["name"],len(data['related_ids'])))
+
+    for ids in [data['related_ids'][i:i+COUNT] for i in range(0, len(data['related_ids']), COUNT)]:
+
+        if ids != data['related_ids'][0:COUNT]:
+            info("Pulsa 'Aceptar' para los siguientes {} elementos.".format(len(ids)))
+
+
+        # COMPUTER ACTIONS
+        if data["related_model"]=="computer":
+
+            if data["name"] == "ping":
+                command = ["gnome-terminal"]
+                for id in ids:
+                    try:
+                        computer = get_computer(id)
+                    except:
+                        info("No encontrado cid: {}".format(id))
+                        break
+
+                    command.append("--tab")
+                    command.append("-e")
+                    command.append(new_tab(computer, [
+                        'echo "FQDN: {fqdn}"',
+                        'echo "Usuario: {sync_user[name]} {sync_user[fullname]}"',
+                        'echo "Ejecutando PING a {ip_address}"',
+                        'ping -c 1 {ip_address}',
+                        'EXIT_CODE=$?'
+                        ]))
+
+            elif data["name"] == "ssh":
+                if password == "":
+                    password = get_password("Protocolo {}".format(data["name"]), "Introduce la contraseña de usuario root")
+                command = ["gnome-terminal"]
+                for id in ids:
+                    try:
+                        computer = get_computer(id)
+                    except:
+                        info("No encontrado cid: {}".format(id))
+                        break
+
+                    command.append("--tab")
+                    command.append("-e")
+                    command.append(new_tab(computer, [
+                        'echo "comprobando conectividad..."',
+                        'echo "FQDN: {fqdn}"',
+                        'ping -c 1 {ip_address} >/dev/null',
+                        'if [ $? = 0 ]',
+                        '  then echo "Conectividad OK"',
+                        '  echo "Ejecutando shell en {ip_address}"',
+                        '  sshpass -p ' + password + ' ssh -t -o StrictHostKeyChecking=no root@{ip_address}',
+                        '  EXIT_CODE=$?',
+                        'else echo "ERROR DE CONECTIVIDAD"',
+                        '  EXIT_CODE=1',
+                        'fi'
+                        ]))
+
+
+            elif data["name"] == "vnc":
+                command = ["gnome-terminal"]
+                for id in ids:
+                    try:
+                        computer = get_computer(id)
+                    except:
+                        info("No encontrado cid: {}".format(id))
+                        break
+
+                    command.append("--tab")
+                    command.append("-e")
+                    command.append(new_tab(computer, [
+                        'echo "comprobando conectividad..."',
+                        'echo "FQDN: {fqdn}"',
+                        'ping -c 1 {ip_address} >/dev/null',
+                        'if [ $? = 0 ]',
+                        '  then echo "Conectividad OK"',
+                        '  echo "Ejecutando vnc en {ip_address}"',
+                        '  vncviewer {ip_address}',
+                        '  EXIT_CODE=$?',
+                        'else echo "ERROR DE CONECTIVIDAD"',
+                        '  EXIT_CODE=1',
+                        'fi'
+                        ]))
+
+
+
+            elif data["name"] == "sync":
+                if password == "":
+                    password = get_password("Protocolo ssh -> migasfree -u", "Introduce la contraseña de root")
+                command = ["gnome-terminal"]
+                for id in ids:
+                    try:
+                        computer = get_computer(id)
+                    except:
+                        info("No encontrado cid: {}".format(id))
+                        break
+
+                    command.append("--tab")
+                    command.append("-e")
+                    command.append(new_tab(computer, [
+                        'echo "comprobando conectividad..."',
+                        'echo "FQDN: {fqdn}"',
+                        'ping -c 1 {ip_address} >/dev/null',
+                        'if [ $? = 0 ]',
+                        '  then echo "Conectividad OK"',
+                        '  echo "Ejecutando  en {ip_address} -> installpackage"',
+                        '  sshpass -p ' + password + ' ssh -t -o StrictHostKeyChecking=no root@{ip_address} -C "migasfree --update"',
+                        '  EXIT_CODE=$?',
+                        'else echo "ERROR DE CONECTIVIDAD"',
+                        '  EXIT_CODE=1',
+                        'fi'
+                        ]))
+
+
+            else:
+                warning("Se necesita implementar la acción:'{}' para el modelo:'{}' en el fichero '{}'.".format(data["name"], data["related_model"], __file__ ))
+                exit(1)
+
+        else:
+            warning("Se necesita implementar la acción:'{}' para el modelo:'{}' en el fichero '{}'.".format(data["name"], data["related_model"], __file__ ))
+            exit(1)
+
+
+        p = sub.Popen(command, stdout=sub.PIPE, stderr=sub.PIPE)
+        output, errors = p.communicate()
+        print output, errors
+
+
+if __name__ == "__main__":
+    main()

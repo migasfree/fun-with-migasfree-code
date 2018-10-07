@@ -1,0 +1,20 @@
+Sample MIGASFREE_EXTERNAL_ACTIONS
+=================================
+
+Adds in settings.py:
+
+MIGASFREE_EXTERNAL_ACTIONS = {
+        "computer": {
+            "ping": {"title": "PING", "description": "comprobar conectividad"},
+            "ssh": {"title": "SSH", "description": "control remoto vía ssh"},
+            "vnc": {"title": "VNC", "description": "control remoto vía vnc", "many": False},
+            "sync": {"title": "SYNC", "description": "ejecutar la sincronización con el servidor migasfree"},
+        },
+}
+
+
+File: usr/lib/firefox/defaults/pref/acme-migasfree-external-actions.js configures 'mea' protocol in firefox.
+
+File: usr/share/applications/acme-migasfree-external-actions.desktop configures 'mea' protocol in chromium.
+
+File: usr/bin/acme-migasfree-external.actions source code for actions.
