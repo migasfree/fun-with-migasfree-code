@@ -1,0 +1,16 @@
+Source: acme-migasfree-play
+Section: utils
+Priority: extra
+Maintainer: Alberto Gacías <alberto@migasfree.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://migasfree.org
+
+Package: acme-migasfree-play
+Architecture: all
+Depends: ${misc:Depends}, migasfree-play (= 1.5.0-1)
+Provides: virtual-migasfree-play
+Conflicts: virtual-migasfree-play
+Replaces: virtual-migasfree-play
+Description: migasfree-play configuration
+ acme migasfree-play configuration
