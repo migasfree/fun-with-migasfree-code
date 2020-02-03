@@ -3,6 +3,8 @@
 
 # Create a deployment named "bluefish_geany"
 
+from __future__ import print_function
+
 import datetime
 
 from migasfree_client.utils import get_mfc_project, get_hardware_uuid
@@ -37,9 +39,9 @@ def main():
         "included_attributes": [all_systems_id, attribute_cid]
     }
 
-    deployment_id = api.add("deployments", data)
+    deployment_id = api.add("deployments/internal-sources", data)
     if deployment_id:
-        print "deployment_id", deployment_id
+        print("deployment_id", deployment_id)
 
 
 if __name__ == "__main__":
