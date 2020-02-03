@@ -3,6 +3,7 @@
 
 # Print project_id
 
+from __future__ import print_function
 from migasfree_client.utils import get_mfc_project
 from migasfree_sdk.api import ApiToken
 
@@ -14,7 +15,8 @@ def main():
     project_name = get_mfc_project()
 
     project_id = api.id("projects", {"name": project_name})
-    print "project_id:", project_id
+    print("project_id:", project_id)
+
 
 if __name__ == "__main__":
     main()
