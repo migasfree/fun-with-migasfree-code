@@ -11,15 +11,15 @@ def main():
     user = "reader"
     api = ApiToken(user=user)
 
-    cid=1
+    cid = 1
 
     # METHOD 1
     data = api.get("computers", {"id": cid})
-    print data["tags"]
+    print(data["tags"])
 
     # METHOD 2
     data = api.get("computers/" + str(cid), {})
-    print data["tags"]
+    print(data["tags"])
 
 
 if __name__ == "__main__":
