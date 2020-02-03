@@ -3,6 +3,7 @@
 
 # Show computers' CID, name and UUID
 
+from __future__ import print_function
 from migasfree_sdk.api import ApiToken
 
 
@@ -14,7 +15,8 @@ def main():
         "computers",
         {"status": "intended", "ordering": "id"}
     ):
-        print element["id"], element["name"], element["uuid"]
+        print(element["id"], element["name"], element["uuid"])
+
 
 if __name__ == "__main__":
     main()
